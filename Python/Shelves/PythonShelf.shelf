@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<shelfDocument>
+  <!-- This file contains definitions of shelves, toolbars, and tools.
+ It should not be hand-edited when it is being used by the application.
+ Note, that two definitions of the same element are not allowed in
+ a single file. -->
+
+  <toolshelf name="PythonShelf0" label="Python Tools">
+    <memberTool name="001_OutNode"/>
+  </toolshelf>
+
+  <toolshelf name="PythonShelf" label="Python Tools"/>
+
+  <tool name="001_OutNode" label="Out Node" icon="PLASMA_App">
+    <script scriptType="python"><![CDATA[
+# Houdini Python shelf tool
+# Adding a null after selected node
+# 
+selAll = hou.selectedNodes()
+if len(selAll) > 0:
+    s = selAll[0]
+    sel = hou.node(s.path())
+    p = hou.node(s.path()).parent()
+    
+    o = p.createNode('null')
+    o.setName("OUT", True)
+    c = hou.Color()
+    c.setRGB([0,1,0])
+    o.setColor(c)
+    o.setCurrent(True, True)
+    o.setFirstInput(sel)
+    o.moveToGoodPosition()
+
+    o.setDisplayFlag(True)
+    o.setRenderFlag(True)
+    ]]></script>
+  </tool>
+</shelfDocument>
