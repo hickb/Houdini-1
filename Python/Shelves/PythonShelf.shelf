@@ -5,14 +5,16 @@
  Note, that two definitions of the same element are not allowed in
  a single file. -->
 
-  <toolshelf name="PythonShelf0" label="Python Tools">
+  <toolshelf name="PythonShelf" label="Python Tools">
     <memberTool name="001_OutNode"/>
+    <memberTool name="002_GlobalVars"/>
+    <memberTool name="003_NoisePoint"/>
   </toolshelf>
-
-  <toolshelf name="PythonShelf" label="Python Tools"/>
 
   <tool name="001_OutNode" label="Out Node" icon="PLASMA_App">
     <script scriptType="python"><![CDATA[
+
+    
 # Houdini Python shelf tool
 # Adding a null after selected node
 # 
@@ -33,6 +35,72 @@ if len(selAll) > 0:
 
     o.setDisplayFlag(True)
     o.setRenderFlag(True)
+
     ]]></script>
   </tool>
+
+
+  <tool name="002_GlobalVars" label="GlobalVars" icon="PLASMA_App">
+    <script scriptType="python"><![CDATA[
+
+'''
+Utility to print Environment variables in Houdini
+
+$HFS = Houdini Installation
+$HOME = Houdini user data path
+$HIP = Workspace(location) of current hip file
+
+'''
+
+#--------------------------
+# FUNCTIONS
+#--------------------------
+
+def printVars():
+    print "\n"
+    print "-----------------------"
+    print "Environment Variables"
+    print "-----------------------"
+    for v in varsToPrint:
+        print "$"+ v + '\t' + str(hou.getenv(v))
+    print "-----------------------"
+
+#--------------------------
+# START HERE
+#--------------------------
+
+varsToPrint = ["HFS", "HOME", "HIP","JOB"]
+printVars()
+
+    ]]></script>
+  </tool>
+
+
+<tool name="003_NoisePoint" label="NoisePoint" icon="PLASMA_App">
+  <script scriptType="python"><![CDATA[
+
+# Noise Point Tool
+for node in hou.selectedNodes():
+
+    t_parms = ["$TX","$TY","$TZ"]
+    position_tuple = node.parmTuple("t")
+
+    # Add parm template
+    frequency_template = hou.FloatParmTemplate('frequency', 'Frequency', 3, (1,1,1))
+    amplitude_template = hou.FloatParmTemplate('amplitude', 'Amplitude', 3, (1,1,1))
+    folder_template = hou.FolderParmTemplate("noise_folder", "Noise Settings", [frequency_template, amplitude_template])
+
+    parm_group = node.parmTemplateGroup()
+    parm_group.insertBefore('group', folder_template)
+    #parm_group.insertBefore(amplitude_template, frequency_template)
+    node.setParmTemplateGroup(parm_group)
+
+    
+    for index, parm in enumerate(position_tuple):
+        parm.deleteAllKeyframes()
+        parm.setExpression(t_parms[index] + " + noise($TX * ch('frequencyx'), $TY * ch('frequencyy') + " + str(index * 500) + ", $TZ * ch('frequencyz'))")
+
+]]></script>
+  </tool>
+
 </shelfDocument>
