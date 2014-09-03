@@ -212,25 +212,26 @@ layout = qtg.QVBoxLayout(widget)
 
 #-------------------------------------------------------------------
 sops = []
-sops.append("null")
-sops.append("group")
-sops.append("merge")
-sops.append("xform")
-sops.append("box")
-sops.append("grid")
-sops.append("skin")
-sops.append("circle")
-sops.append("facet")
-sops.append("carve")
+sops.append("NULL")
+sops.append("Group")
+sops.append("Merge")
+sops.append("Xform")
+sops.append("Box")
+sops.append("Grid")
+sops.append("Skin")
+sops.append("Circle")
+sops.append("Facet")
+sops.append("Carve")
 
 #-------------------------------------------------------------------
 
 for i in range(0, len(sops)):
     sop = sops[i]
-    b = qtg.QPushButton("Create " + sop, widget)
+    b = qtg.QPushButton(sop, widget)
+    b.setFixedWidth(150)
     if i < 4:  
         b.setStyleSheet('QPushButton {background-color: blue; color: yellow}')
-    b.clicked.connect(partial(create_sop,sop))
+    b.clicked.connect(partial(create_sop,sop.lower()))
     layout.addWidget(b)
 
 b2 = qtg.QPushButton("Close", widget)
