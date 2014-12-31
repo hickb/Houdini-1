@@ -1,0 +1,20 @@
+sop
+ext_vex_collision_deformer()
+{
+
+float dist = volumesample(1, "sdf", P);
+
+// If inside the surface
+if(dist < 0)
+{
+    
+    vector g = volumegradient(1, "sdf", P); 
+    vector dir = normalize(g);
+    
+    P += dir * abs(dist);
+    
+    // Color it
+    Cd = {1, 0, 1};
+}
+
+}

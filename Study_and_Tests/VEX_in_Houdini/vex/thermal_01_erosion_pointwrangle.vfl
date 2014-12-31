@@ -1,0 +1,41 @@
+#include "$HIP/../src/vih_coord.vfl"
+
+// assuming a square grid and that all points in the input are part of the
+// grid, we take the square of the number of points coming in to find the
+// x and y dimensions
+int dim = (int)sqrt(@Npt);
+
+float talus_angle = (ch("talus_angle") / (float)dim); // adapts to image res
+float transfer    = 0.95;
+
+int x_lt, x_rt, y_up, y_dn, x, y;
+float avg_height, slope, current_height, new_height;
+
+x = @ptnum % dim;
+y = (int)((float)@ptnum / (float)dim);
+
+// get the top and bottom coordinates
+y_up = mirror_coord(y,  1, dim);
+y_dn = mirror_coord(y, -1, dim);
+
+// get the left and right coordinates
+x_lt = mirror_coord(x,  1, dim);
+x_rt = mirror_coord(x, -1, dim);
+
+// compare the talus angle
+avg_height  = point(0, "height", y    * dim + x_lt);
+avg_height += point(0, "height", y    * dim + x_rt);
+avg_height += point(0, "height", y_up * dim + x   );
+avg_height += point(0, "height", y_dn * dim + x   );
+avg_height *= 0.25;
+
+current_height = f@height;
+slope = current_height - avg_height;
+
+if (abs(slope) > talus_angle)
+    new_height = current_height - (slope * transfer);
+else
+    new_height = current_height;
+
+f@height = new_height;
+@P.y = new_height;

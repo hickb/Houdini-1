@@ -1,0 +1,40 @@
+#include "$HIP/../src/vih_coord.vfl"
+
+int dim = (int)sqrt(@Npt);
+
+float step        = 1.0/48.0;
+float speed_scale = 1.0;
+
+int x = @ptnum % dim;
+int y = (int)((float)@ptnum / (float)dim);
+
+// clamp velocity to 1.0
+if (length(@v) > 1.0)
+    @v = normalize(@v);
+
+// current position minus v * step and interpolate sediment
+float advected_x = (float)x - (@v.x * step * speed_scale);
+float advected_y = (float)y - (@v.y * step * speed_scale);
+
+// find nearest two x values
+int x1 = mirror_coord(floor(advected_x), 0, dim);
+int x2 = mirror_coord(x1 + 1,            0, dim);
+// weights for each point
+float x2w = abs(x1 - advected_x);
+float x1w = 1.0 - x2w;
+
+// find nearest two y values
+int y1 = mirror_coord(floor(advected_y), 0, dim);
+int y2 = mirror_coord(y1 + 1,            0, dim);
+// weights for each point
+float y2w = abs(y1 - advected_y);
+float y1w = 1.0 - y2w;
+
+// calculate the linear interpolation of the 4 nearest points
+float interpolated_sediment = 0;
+interpolated_sediment += point(0, "sediment", (y1 * dim) + x1) * y1w * x1w;
+interpolated_sediment += point(0, "sediment", (y2 * dim) + x1) * y2w * x1w;
+interpolated_sediment += point(0, "sediment", (y1 * dim) + x2) * y1w * x2w;
+interpolated_sediment += point(0, "sediment", (y2 * dim) + x2) * y2w * x2w;
+
+f@sediment = interpolated_sediment;

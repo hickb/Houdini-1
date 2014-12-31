@@ -1,0 +1,5 @@
+float step        = 1.0/48.0;
+float evaporation = 0.55;
+
+f@water *= 1.0 - (evaporation * step);
+@P.y = f@height;

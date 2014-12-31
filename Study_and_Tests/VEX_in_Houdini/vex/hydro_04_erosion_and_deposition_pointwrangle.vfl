@@ -1,0 +1,23 @@
+#include "$HIP/../src/vih_coord.vfl"
+
+float step        = 1.0/48.0;
+float slope_min   = 0.001;
+float capacity    = 0.195; // Kc
+float dissolve    = 0.005; // Ks
+float deposition  = 0.005; // Kd
+
+float slope = 1.0;
+// alternatively, base erosion on slope, inverse of slope or height:
+//    float slope = dot({0,1,0}, @N);
+
+float trans_capacity = capacity * length(@v) * slope;
+
+if (trans_capacity > f@sediment) {
+    // if the water over this cell can hold more soil, dissolve some
+    f@height   -= dissolve * (trans_capacity - f@sediment);
+    f@sediment += dissolve * (trans_capacity - f@sediment);
+} else {
+    // more sediment can't be held so we deposite some
+    f@height   += deposition * (f@sediment - trans_capacity);
+    f@sediment -= deposition * (f@sediment - trans_capacity);
+}

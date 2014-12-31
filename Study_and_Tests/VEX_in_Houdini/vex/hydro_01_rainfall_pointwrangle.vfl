@@ -1,0 +1,4 @@
+float step        = 1.0/48.0;
+float rain_amount = 0.30;
+
+f@water += rain_amount * step;

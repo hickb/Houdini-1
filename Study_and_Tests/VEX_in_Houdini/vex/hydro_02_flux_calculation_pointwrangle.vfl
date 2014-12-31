@@ -1,0 +1,68 @@
+#include "$HIP/../src/vih_coord.vfl"
+
+// assuming a square grid and that all points in the input are part of the
+// grid, we take the square of the number of points coming in to find the
+// x and y dimensions
+int dim = (int)sqrt(@Npt);
+
+float step = 1.0/48.0;
+float g    = 2.5;
+
+// first, find the change in altitude of the von-neumann neighborhood
+// start by gathering the 4 neighborhood coordinates (left, right, up, down)
+int x = @ptnum % dim;
+int y = (int)((float)@ptnum / (float)dim);
+
+// get the top and bottom coordinates
+int y_up = wrap_coord(y,  1, dim);
+int y_dn = wrap_coord(y, -1, dim);
+
+// get the left and right coordinates
+int x_lt = wrap_coord(x,  1, dim);
+int x_rt = wrap_coord(x, -1, dim);
+
+// height of all four neighbor cells ('alt' for altitude)
+float alt1  = point(0, "height", y    * dim + x_lt) +
+              point(0, "water" , y    * dim + x_lt); // x
+float alt2  = point(0, "height", y    * dim + x_rt) +
+              point(0, "water" , y    * dim + x_rt); // y
+float alt3  = point(0, "height", y_up * dim + x   ) +
+              point(0, "water" , y_up * dim + x   ); // z
+float alt4  = point(0, "height", y_dn * dim + x   ) +
+              point(0, "water" , y_dn * dim + x   ); // w
+
+// altitude of the current cell
+float altitude = f@height + f@water;
+
+// flux represents the water moving out in a direction:
+//     flux.x = left
+//     flux.y = right
+//     flux.z = up
+//     flux.w = down
+
+// outflow flux calculation:
+//     new_flux = old_flux + step * gravity * height_difference
+//     new_flux = max(0, new_flux) // can't go negative
+p@flux.x = max(0, p@flux.x + (step * g * (altitude - alt1)) );
+p@flux.y = max(0, p@flux.y + (step * g * (altitude - alt2)) );
+p@flux.z = max(0, p@flux.z + (step * g * (altitude - alt3)) );
+p@flux.w = max(0, p@flux.w + (step * g * (altitude - alt4)) );
+
+// scaling factor K for outflow
+float K = min(1, (f@water * 1.0 * 1.0) /
+                 ((p@flux.x + p@flux.y + p@flux.z + p@flux.w) * step));
+p@flux.x *= K;
+p@flux.y *= K;
+p@flux.z *= K;
+p@flux.w *= K;
+
+// outflow at the boundries needs to be zero
+if (x == 0)          // at the right?
+    p@flux.y = 0;    // can't flow right
+else if (x == dim-1) // at the left?
+    p@flux.x = 0;    // can't flow left
+
+if (y == 0)          // at the bottom?
+    p@flux.w = 0;    // can't flow down
+else if (y == dim-1) // at the top?
+    p@flux.z = 0;    // can't flow up

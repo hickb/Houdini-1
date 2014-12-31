@@ -1,0 +1,64 @@
+#include "$HIP/../src/vih_coord.vfl"
+
+int dim = (int)sqrt(@Npt);
+
+float step = 1.0/48.0;
+
+// the normal coordinate stuff
+int x = @ptnum % dim;
+int y = (int)((float)@ptnum / (float)dim);
+
+// get the top and bottom coordinates
+int y_up = wrap_coord(y,  1, dim);
+int y_dn = wrap_coord(y, -1, dim);
+
+// get the left and right coordinates
+int x_lt = wrap_coord(x,  1, dim);
+int x_rt = wrap_coord(x, -1, dim);
+
+// find the water flowing in from neighbors - the inflow sum
+vector4 temp;
+float inflow_sum = 0;
+// temp.x = left
+// temp.y = right
+// temp.z = up
+// temp.w = down
+
+// left inflow is the left neighbors outflow flux to the right (temp.x)
+temp = point(0, "flux", y    * dim + x_lt);
+float in_from_lt = temp.y;
+inflow_sum += temp.y;
+
+temp = point(0, "flux", y    * dim + x_rt);
+float in_from_rt = temp.x;
+inflow_sum += temp.x;
+
+temp = point(0, "flux", y_up * dim + x   );
+float in_from_up = temp.w;
+inflow_sum += temp.w;
+
+temp = point(0, "flux", y_dn * dim + x   );
+float in_from_dn = temp.z;
+inflow_sum += temp.z;
+
+// outflow some we can find easily:
+float outflow_sum = p@flux.x + p@flux.y + p@flux.z + p@flux.w;
+
+// volume change in water is the difference in the amount flowing in minus
+// the amount flowing out scaled by the time step
+float volume_delta = step * (inflow_sum - outflow_sum);
+
+float water_pre_flow = f@water;
+f@water += volume_delta * 1 * 1; // lx, ly are 1 for simplicity
+
+// velocity
+// wx_delta is the change in water per unit time in the x direction
+// flux_out_from_left_neighbor_going_right - flux_left
+float wx_delta = ((in_from_lt - p@flux.x) + (p@flux.y - in_from_rt)) / 2.0;
+float wy_delta = ((in_from_up - p@flux.z) + (p@flux.w - in_from_dn)) / 2.0;
+
+// water average amount over the current step
+float w_avg = (water_pre_flow + f@water) / 2.0;
+
+@v.x = wx_delta / (w_avg * -1);
+@v.z = wy_delta / (w_avg * -1);

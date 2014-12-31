@@ -1,0 +1,13 @@
+#include "$HIP/../src/vih_noise.vfl"
+
+float  scale     = 6.25;
+float  exponent  = 1.6;
+vector frequency = {0.2, 0.2, 0.2};
+vector offset    = {0, 34, 0};
+
+// distort noise lookup with a vector noise applied to the lookup position
+vector distortion = v_turb(@P * frequency + offset + {1,9,4}, 0.48, 2.0, 6);
+vector height_lookup_coord = @P * frequency + offset + distortion;
+
+@P.y += pow_abs_turb(height_lookup_coord, 0.51, 2.1234, 9, exponent) * scale;
+f@height = @P.y;
