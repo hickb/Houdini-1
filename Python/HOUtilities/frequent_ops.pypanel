@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pythonPanelDocument>
+  <!-- This file contains definitions of Python interfaces and the
+ interfaces menu.  It should not be hand-edited when it is being
+ used by the application.  Note, that two definitions of the
+ same interface or of the interfaces menu are not allowed
+ in a single file. -->
+  <interface name="Frequent_OPs" label="Frequent OPs" icon="MISC_python">
+    <script><![CDATA[########################################################################
+# Frequent OPs
+# by Vishang Shah (vishangshah.com)
+#
+# Frequently used Operators
+#
+########################################################################
+
+import HOUtilities
+
+from HOUtilities import FrequentOPs
+reload(FrequentOPs)
+
+def createInterface():
+    return FrequentOPs.FrequentOPs()]]></script>
+  </interface>
+</pythonPanelDocument>
