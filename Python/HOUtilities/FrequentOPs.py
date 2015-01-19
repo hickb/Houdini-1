@@ -1,7 +1,7 @@
 ########################################################################
 # Frequent OPs
 # by Vishang Shah (vishangshah.com)
-# IMPORTANT : This tool is tested and works only with Houdini 14, due to PySide support.
+# IMPORTANT : This tool is tested and works only with Houdini 14.
 #
 # Description : Provides an interface for quick access to frequently used OPs
 #
@@ -16,7 +16,9 @@ import json
 
 import hou
 
-from PySide import QtCore, QtGui, QtWebKit
+from PySide.QtCore import *
+from PySide.QtGui import *
+from PySide import QtWebKit
 from functools import partial
 
 from . import Color
@@ -34,16 +36,14 @@ class FrequentOPs(QtGui.QFrame):
 		self.opNames = []
 
 		# UI vars
-		self.ui_button_width = 120
-		self.ui_button_height = 40
+		self.ui_button_width    = 120
+		self.ui_button_height   = 40
 
 		# Main Layout
 		self.mainLayout = QtGui.QHBoxLayout()
 		self.setLayout(self.mainLayout)
 
-		#helloWidget = QtGui.QLabel('Frequent OPs')
-		#self.mainLayout.addWidget(helloWidget)
-		
+
 		self.refreshOpNames()
 
 
@@ -57,6 +57,7 @@ class FrequentOPs(QtGui.QFrame):
 		self.opNames.append("curve")
 		self.opNames.append("grid")
 		self.opNames.append("box")
+		self.opNames.append("sphere")
 		self.opNames.append("-")
 		self.opNames.append("resample")
 		self.opNames.append("carve")
@@ -120,14 +121,7 @@ class FrequentOPs(QtGui.QFrame):
 
 			newNode = parentNode.createNode(opName)
 			newNode.setName(opName, True)
-			'''
-			colorGreen = hou.Color()
-			colorGreen.setRGB([0,1,0])
 
-			colorBlack = hou.Color()
-			colorBlack.setRGB([0,0,0])
-			'''
-			#colorBlack = hou.Color((0,0,0))
 			if(opName == "null"):
 				newNode.setColor(Color.Black)
 			else:
@@ -144,36 +138,4 @@ class FrequentOPs(QtGui.QFrame):
 			newNode.setDisplayFlag(True)
 			newNode.setRenderFlag(True)
 
-
-	def findLoadedHDAs(self):
-		'''
-		Returns a list of loaded HDAs in Houdini scene.
-		HDAs installed by default with Houdini are skipped.
-		'''
-		self.loadedHDAs = []
-		# Scan all node categories
-		for category in hou.nodeTypeCategories().values():
-			# Scan all node types
-			for nodeType in category.nodeTypes().values():
-				nodeDef = nodeType.definition()
-				# If its a valid and unique HDA
-				if (nodeDef is not None) and \
-					(nodeDef.libraryFilePath() not in self.loadedHDAs):
-					# If not stored at "HFS" (Houdini Installation)
-					if not nodeDef.libraryFilePath().startswith(hou.getenv("HFS")):
-						self.loadedHDAs.append(nodeDef)
-
-		self.populateHDALayout()
-
-	def populateHDALayout(self):
-		'''
-		Populate layout with loaded HDAs.
-		'''
-		for hda in self.loadedHDAs:
-			print hda.description()
-			btnHDA = QtGui.QPushButton(hda.description())
-			btnHDA.setMinimumWidth(self.ui_button_width)
-			self.mainLayout.addWidget(btnHDA)
-
-		
 
