@@ -28,7 +28,7 @@ reload(Color)
 # Reload
 
 # HDAManager
-class FrequentOPs(QtGui.QFrame):
+class FrequentOPs(QFrame):
 	def __init__(self, parent=None):
 		super(FrequentOPs, self).__init__(parent)
 
@@ -40,7 +40,7 @@ class FrequentOPs(QtGui.QFrame):
 		self.ui_button_height   = 40
 
 		# Main Layout
-		self.mainLayout = QtGui.QHBoxLayout()
+		self.mainLayout = QHBoxLayout()
 		self.setLayout(self.mainLayout)
 
 
@@ -80,16 +80,16 @@ class FrequentOPs(QtGui.QFrame):
 		for i in range(0, len(self.opNames)):
 			if(self.opNames[i] == "-"):
 				#self.mainLayout.addStretch(1)
-				columnLayout = QtGui.QVBoxLayout()
-				columnLayout.setAlignment(QtCore.Qt.AlignTop)
+				columnLayout = QVBoxLayout()
+				columnLayout.setAlignment(Qt.AlignTop)
 				columns.append(columnLayout)
 			else:
 				if(i == 0):
-					columnLayout = QtGui.QVBoxLayout()
-					columnLayout.setAlignment(QtCore.Qt.AlignTop)
+					columnLayout = QVBoxLayout()
+					columnLayout.setAlignment(Qt.AlignTop)
 					columns.append(columnLayout)
 				op = self.opNames[i]
-				btnOp = QtGui.QPushButton(op)
+				btnOp = QPushButton(op)
 				btnOp.setMaximumWidth(self.ui_button_width)
 				btnOp.setMinimumHeight(self.ui_button_height)
 				btnOp.setMaximumHeight(self.ui_button_height)
