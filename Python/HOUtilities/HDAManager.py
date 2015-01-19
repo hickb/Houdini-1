@@ -30,6 +30,10 @@ reload(Color)
 # HDAManager
 class HDAManager(QWidget):
 	def __init__(self, parent=None):
+		'''
+		Initialize HDAManager and create skeleton layout.
+		'''
+		
 		super(HDAManager, self).__init__(parent)
 
 		# all HDAs in current houdini file
@@ -64,7 +68,7 @@ class HDAManager(QWidget):
 		btnSaveAll = QPushButton("Save All")
 		btnSaveAll.setMinimumWidth(self.ui_button_width)
 		btnSaveAll.setMaximumWidth(self.ui_button_width)
-		#btnSaveAll.clicked.connect(self.findLoadedHDAs)
+		btnSaveAll.clicked.connect(self.saveAllHDAs)
 		fixedLayout.addWidget(btnSaveAll)
 
 		self.layout.addLayout(fixedLayout)
@@ -141,7 +145,7 @@ class HDAManager(QWidget):
 			btnSave.setMaximumWidth(120)
 			icon = btnSave.style().standardIcon(QStyle.SP_DialogSaveButton)
 			btnSave.setIcon(icon)
-			btnSave.clicked.connect(partial(self.saveHDA, hda))
+			btnSave.clicked.connect(partial(self.saveHDA, hda, False))
 			row.addWidget(btnSave)
 
 			HDALayout.addLayout(row)
@@ -156,15 +160,30 @@ class HDAManager(QWidget):
 
 		self.layout.addWidget(scroll)
 
-	def saveHDA(self, hda):
+	def saveHDA(self, hda, saveAllMode):
+		'''
+		Save a particular HDA.
+		'''
+
 		print("Save - " + hda.description())
+		foundInstance = False
 
 		# Get all instances of HDA
 		for node in hou.node("/").allSubChildren():
 			if (node.type().definition() == hda and (not node.isLocked())):
 				node.type().definition().updateFromNode(node)
+				foundInstance = True
 
+		if not saveAllMode:
+			if not foundInstance:
+				hou.ui.displayMessage(hda.description() + " is either not instanced or all instances are locked.")
 
+	def saveAllHDAs(self):
+		'''
+		Save all HDAs in the Layout.
+		'''
+		for hda in self.loadedHDAs:
+			self.saveHDA(hda, True)
 			
 				
         
