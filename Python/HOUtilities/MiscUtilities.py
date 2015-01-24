@@ -13,6 +13,7 @@
 # Usage : Copy the parent folder HOUtilities to [your houdini 14.0 installation]\houdini\python2.7libs\
 #
 To Do : Expose switch input to parent HDA or geometry's Parameters
+To Do : Option to have an auto-Null input to switch op. Like "Switch to nothing" mode.
 #
 ########################################################################
 '''
@@ -94,9 +95,7 @@ class MiscUtilities(QFrame):
 			# Insert switch between current and its immediate output node
 			if len(outNodes) > 0:
 				currentOut = outNodes[0]
-				print currentOut
 				currentOut.setFirstInput(newNode)
-
 			
 			newNode.moveToGoodPosition()
 
