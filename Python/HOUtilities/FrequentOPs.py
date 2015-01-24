@@ -1,3 +1,4 @@
+'''
 ########################################################################
 # Frequent OPs
 # by Vishang Shah (vishangshah.com)
@@ -5,14 +6,20 @@
 #
 # Description : Provides an interface for quick access to frequently used OPs
 #
-# Usage : Copy the folder Frequent_OPs to [your houdini 14.0 installation]\houdini\python2.7libs\
+# Usage : Copy the parent folder HOUtilities to [your houdini 14.0 installation]\houdini\python2.7libs\
+#
+To Do : Move list of OP names to an external XML or JSON file.
+To Do : Provide functionality to users to create/modify this OP names list in Houdini itself.
+To Do : Preferences. To set prefered colors for OPs as well as layout presets for SOPs, DOPs etc...
+To Do : Not having to select any OP for the creation of new one.
+To Do : Context specific layout to separate SOP and VOPSOP OPs.
 #
 ########################################################################
+'''
 
 # Import libraries
 import os
 import sys
-import json
 
 import hou
 
@@ -22,7 +29,6 @@ from PySide import QtWebKit
 from functools import partial
 
 from . import Color
-
 reload(Color)
 
 # Reload
@@ -48,6 +54,10 @@ class FrequentOPs(QFrame):
 
 
 	def listOpNames(self):
+		'''
+		Define list of OPs to be added.
+		OPs are separated into columns by "-" separator.
+		'''
 		self.opNames = []
 		self.opNames.append("null")
 		self.opNames.append("group")
@@ -102,24 +112,16 @@ class FrequentOPs(QFrame):
 			self.mainLayout.addLayout(column)
 			#self.mainLayout.addStretch(0)
 
-		# Clear main layout
-		
-		'''
-		btnRefresh = QtGui.QPushButton("Refresh")
-		btnRefresh.setMinimumWidth(self.ui_button_width)
-		btnRefresh.setMaximumWidth(self.ui_button_width)
-		btnRefresh.clicked.connect(self.create_sop)
-		self.mainLayout.addWidget(btnRefresh)
-		'''
 
 	def create_sop(self, opName = "null"):
 		currentSel = hou.selectedNodes()
 		if len(currentSel) == 1:
-			#s = currentSel[0]
-			#sel = hou.node(s.path())
-			parentNode = hou.node(currentSel[0].path()).parent()
+			current = currentSel[0]
+			parentNode = hou.node(current.path()).parent()
 
-			newNode = parentNode.createNode(opName)
+			#newNode = parentNode.createNode(opName)
+			newNode = current.createOutputNode(opName)
+
 			newNode.setName(opName, True)
 
 			if(opName == "null"):
@@ -129,10 +131,13 @@ class FrequentOPs(QFrame):
 
 			newNode.setCurrent(True, True)
 
+			'''
 			try:
-				newNode.setFirstInput(hou.node(currentSel[0].path()))
+				newNode.setFirstInput(hou.node(current.path()))
 			except:
 				pass
+			'''
+
 			newNode.moveToGoodPosition()
 
 			newNode.setDisplayFlag(True)

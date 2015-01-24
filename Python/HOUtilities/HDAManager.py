@@ -1,3 +1,4 @@
+'''
 ########################################################################
 # HDA Manager
 # by Vishang Shah (vishangshah.com)
@@ -5,14 +6,18 @@
 #
 # Description : Provides an interface for quick access to some HDA functionalities.
 #
-# Usage : Copy the folder HDA_Manager to [your houdini 14.0 installation]\houdini\python2.7libs\
+# Usage : Copy the parent folder HOUtilities to [your houdini 14.0 installation]\houdini\python2.7libs\
+#
+To Do : "Favourite" HDAs in the layout.
+To Do : Ability to add or remove digital asset.
+To Do : Find all "Unlocked" HDAs inside a particular HDA.
+To Do : Perforce commands with HDAs. Check-out, check-in, etc...
 #
 ########################################################################
-
+'''
 # Import libraries
 import os
 import sys
-import json
 
 import hou
 
@@ -113,27 +118,15 @@ class HDAManager(QWidget):
 		HDALayout = QVBoxLayout()
 		
 		# Iterate through all HDA assets and create the layout
-		#for i in range(0, 100):
 		for hda in self.loadedHDAs:
 			print hda.description()
 			row = QHBoxLayout()
 			row.setAlignment(Qt.AlignLeft)
 
 			btnFav = QToolButton()
-			#icon = btnFav.style().standardIcon(QStyle.SP_TitleBarContextHelpButton)
 			icon = btnFav.style().standardIcon(QStyle.SP_ArrowUp)
 			btnFav.setIcon(icon)
 			row.addWidget(btnFav)
-
-			'''
-			btnLockToggle = QToolButton()
-			btnLockToggle.setMinimumWidth(50)
-			btnLockToggle.setMaximumWidth(50)
-			icon = btnLockToggle.style().standardIcon(QStyle.SP_DialogOpenButton)
-			btnLockToggle.setIcon(icon)
-			btnLockToggle.clicked.connect(partial(self.toggleLockOnHDA, hda, btnLockToggle))
-			row.addWidget(btnLockToggle)
-			'''
 
 			lblHDA = QLabel(hda.description())
 			lblHDA.setMinimumWidth(150)
